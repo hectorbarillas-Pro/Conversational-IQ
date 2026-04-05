@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conversational IQ</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F7F5F0;--surface:#FFFFFF;--text:#1A1A1A;--muted:#6B6860;--border:rgba(0,0,0,0.09);--shadow:0 2px 24px rgba(0,0,0,0.07);--D:#B83232;--I:#1A6FA8;--S:#1A7A42;--C:#5E2D8A;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;justify-content:center;padding:2.5rem 1rem 5rem;}
+.card{background:var(--surface);border-radius:22px;box-shadow:var(--shadow);width:100%;max-width:580px;padding:2.75rem 2.75rem 2.25rem;border:1px solid var(--border);}
+.intro{text-align:center;}
+.brand{font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:2.25rem;}
+.intro h1{font-family:'DM Serif Display',serif;font-size:40px;font-weight:400;line-height:1.12;margin-bottom:1rem;}
+.intro p{font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:2rem;}
+.disc-row{display:flex;justify-content:center;gap:1.75rem;margin-bottom:2.5rem;}
+.disc-dot{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.disc-dot .dot{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:15px;color:#fff;}
+.disc-dot span{font-size:11px;color:var(--muted);}
+.btn-primary{background:var(--text);color:#fff;border:none;border-radius:50px;padding:14px 44px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;letter-spacing:0.02em;transition:opacity 0.15s,transform 0.12s;}
+.btn-primary:hover{opacity:0.82;transform:translateY(-1px);}
+.prog-wrap{margin-bottom:2.25rem;}
+.prog-meta{display:flex;justify-content:space-between;margin-bottom:8px;}
+.prog-label{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);}
+.prog-count{font-size:12px;color:var(--muted);}
+.prog-track{height:2px;background:rgba(0,0,0,0.08);border-radius:2px;}
+.prog-fill{height:100%;background:var(--text);border-radius:2px;transition:width 0.4s ease;}
+.q-eyebrow{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.65rem;}
+.q-text{font-family:'DM Serif Display',serif;font-size:27px;font-weight:400;line-height:1.3;margin-bottom:1.75rem;}
+.options{display:grid;gap:10px;margin-bottom:2rem;}
+.opt{background:transparent;border:1px solid var(--border);border-radius:13px;padding:14px 18px;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--text);cursor:pointer;text-align:left;display:flex;align-items:center;gap:13px;transition:all 0.14s;position:relative;overflow:hidden;}
+.opt::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:transparent;transition:background 0.14s;}
+.opt:hover{background:rgba(0,0,0,0.025);border-color:rgba(0,0,0,0.18);}
+.opt.sel{border-color:var(--text);background:rgba(0,0,0,0.025);}
+.opt.sel::before{background:var(--text);}
+.opt-circle{width:20px;height:20px;border-radius:50%;border:1.5px solid rgba(0,0,0,0.18);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.14s;}
+.opt.sel .opt-circle{background:var(--text);border-color:var(--text);}
+.opt.sel .opt-circle::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff;}
+.nav{display:flex;align-items:center;}
+.btn-back{background:transparent;border:1px solid var(--border);border-radius:50px;padding:10px 22px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--muted);cursor:pointer;transition:all 0.14s;}
+.btn-back:hover{border-color:rgba(0,0,0,0.22);color:var(--text);}
+.btn-next{background:var(--text);border:none;border-radius:50px;padding:11px 28px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;color:#fff;cursor:pointer;margin-left:auto;transition:all 0.14s;}
+.btn-next:hover:not(:disabled){opacity:0.82;transform:translateY(-1px);}
+.btn-next:disabled{opacity:0.22;cursor:not-allowed;transform:none;}
+.result{animation:fadeUp 0.45s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.result-eyebrow{font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);text-align:center;margin-bottom:0.5rem;}
+.arch-name{font-family:'DM Serif Display',serif;font-size:42px;font-weight:400;text-align:center;margin-bottom:0.3rem;}
+.arch-code{display:inline-flex;font-size:12px;font-weight:500;letter-spacing:0.08em;padding:4px 14px;border-radius:20px;border:1px solid var(--border);color:var(--muted);margin-bottom:1.5rem;}
+.result-top{display:flex;flex-direction:column;align-items:center;margin-bottom:2rem;}
+.dual-note{background:#FAFAF7;border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem;font-size:14px;color:var(--muted);line-height:1.65;margin-bottom:1.75rem;}
+.dual-note strong{color:var(--text);font-weight:500;}
+.radar-wrap{display:flex;justify-content:center;margin-bottom:1.75rem;}
+.score-bars{margin-bottom:2rem;}
+.score-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.score-k{width:16px;font-size:13px;font-weight:500;}
+.score-track{flex:1;height:5px;background:rgba(0,0,0,0.07);border-radius:3px;overflow:hidden;}
+.score-bar{height:100%;border-radius:3px;transition:width 0.7s ease;}
+.score-pct{width:34px;font-size:13px;color:var(--muted);text-align:right;}
+.divider{border:none;border-top:1px solid var(--border);margin:2rem 0;}
+.section{margin-bottom:2rem;}
+.section-label{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:0.75rem;}
+.arch-desc{font-size:15px;line-height:1.75;color:var(--text);}
+.frase{font-family:'DM Serif Display',serif;font-size:21px;font-style:italic;line-height:1.4;color:var(--text);border-left:3px solid var(--text);padding-left:1.25rem;margin:1rem 0 0;}
+.bullets{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.bullets li{display:flex;gap:10px;font-size:15px;line-height:1.6;color:var(--text);}
+.bullets li::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--text);flex-shrink:0;margin-top:8px;}
+.bullets.warn li::before{background:#B83232;}
+.energy-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.energy-card{background:#FAFAF7;border:1px solid var(--border);border-radius:12px;padding:1rem 1.1rem;}
+.energy-card .ec-label{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.6rem;}
+.energy-card ul{list-style:none;display:flex;flex-direction:column;gap:5px;}
+.energy-card ul li{font-size:13px;line-height:1.5;color:var(--text);display:flex;gap:7px;}
+.energy-card ul li::before{content:'';width:4px;height:4px;border-radius:50%;flex-shrink:0;margin-top:7px;}
+.energy-card.up ul li::before{background:var(--S);}
+.energy-card.down ul li::before{background:var(--D);}
+.rel-grid{display:grid;gap:10px;}
+.rel-row{display:flex;gap:12px;align-items:flex-start;}
+.rel-badge{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:#fff;flex-shrink:0;margin-top:2px;}
+.rel-text{font-size:14px;line-height:1.6;color:var(--text);}
+.rel-text strong{font-weight:500;}
+.pill-row{display:flex;flex-wrap:wrap;gap:7px;}
+.pill{font-size:13px;padding:5px 13px;border-radius:20px;border:1px solid var(--border);color:var(--text);}
+.btn-restart{background:transparent;border:1px solid var(--border);border-radius:50px;padding:11px 28px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--muted);cursor:pointer;display:block;margin:2rem auto 0;transition:all 0.14s;}
+.btn-restart:hover{border-color:rgba(0,0,0,0.25);color:var(--text);}
+@media(max-width:480px){.card{padding:1.75rem 1.5rem 1.5rem;}.q-text{font-size:22px;}.arch-name{font-size:32px;}.energy-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="card" id="app"></div>
+<script>
+const Q=[
+  {t:"Soy…",o:[{l:"Asertivo/a",d:"D"},{l:"Lógico/a",d:"C"},{l:"Apasionado/a",d:"I"},{l:"Tranquilo/a",d:"S"}]},
+  {t:"En situaciones con otros, soy…",o:[{l:"Convincente",d:"I"},{l:"Decidido/a",d:"D"},{l:"Relajado/a",d:"S"},{l:"Escéptico/a",d:"C"}]},
+  {t:"Tiendo a ser…",o:[{l:"Calmado/a",d:"S"},{l:"Directo/a",d:"D"},{l:"Preciso/a",d:"C"},{l:"Sociable",d:"I"}]},
+  {t:"Al tomar decisiones, soy…",o:[{l:"Conversador/a",d:"I"},{l:"Decidido/a",d:"D"},{l:"Cauteloso/a",d:"S"},{l:"Tradicional",d:"C"}]},
+  {t:"Mis amigos me describirían como…",o:[{l:"Aventurero/a",d:"D"},{l:"Tranquilo/a",d:"S"},{l:"Extrovertido/a",d:"I"},{l:"Perspicaz",d:"C"}]},
+  {t:"En grupos, soy…",o:[{l:"Dramático/a",d:"I"},{l:"Inventivo/a",d:"C"},{l:"Persuasivo/a",d:"I"},{l:"Discreto/a",d:"S"}]},
+  {t:"Trabajo mejor cuando…",o:[{l:"Alcanzo metas",d:"D"},{l:"Construyo relaciones",d:"I"},{l:"Sigo reglas",d:"C"},{l:"Ayudo a otros",d:"S"}]},
+  {t:"Mi tendencia natural es…",o:[{l:"Desafiar la autoridad",d:"D"},{l:"Colaborar",d:"S"},{l:"Cumplir",d:"C"},{l:"Innovar",d:"I"}]},
+  {t:"Otros me ven como…",o:[{l:"Ambicioso/a",d:"D"},{l:"Confiable",d:"S"},{l:"Detallista",d:"C"},{l:"Dinámico/a",d:"I"}]},
+  {t:"En conflictos, generalmente soy…",o:[{l:"Evasivo/a",d:"S"},{l:"Directo/a al confrontar",d:"D"},{l:"Diplomático/a",d:"I"},{l:"Analítico/a",d:"C"}]},
+  {t:"Prefiero ambientes de trabajo que sean…",o:[{l:"Competitivos",d:"D"},{l:"Armoniosos",d:"S"},{l:"Ordenados",d:"C"},{l:"Estimulantes",d:"I"}]},
+  {t:"Ante los cambios, tiendo a…",o:[{l:"Adaptarme rápido",d:"D"},{l:"Entusiasmarme",d:"I"},{l:"Tomarme mi tiempo",d:"S"},{l:"Analizar primero",d:"C"}]},
+  {t:"La gente acude a mí por…",o:[{l:"Respuestas directas",d:"D"},{l:"Consuelo y apoyo",d:"S"},{l:"Orientación técnica",d:"C"},{l:"Ideas y entusiasmo",d:"I"}]},
+  {t:"Valoro sobre todo…",o:[{l:"Precisión",d:"C"},{l:"Armonía",d:"S"},{l:"Resultados",d:"D"},{l:"Variedad",d:"I"}]},
+  {t:"Mi estilo de comunicación es…",o:[{l:"Analítico",d:"C"},{l:"Detallado y metódico",d:"C"},{l:"Rápido y directo",d:"D"},{l:"Amigable y expresivo",d:"I"}]},
+  {t:"Bajo presión, me vuelvo…",o:[{l:"Más cauteloso/a",d:"C"},{l:"Controlador/a",d:"D"},{l:"Más callado/a",d:"S"},{l:"Más impulsivo/a",d:"I"}]},
+  {t:"Me siento más cómodo/a cuando…",o:[{l:"Tengo el control",d:"D"},{l:"Estoy conectado/a con otros",d:"I"},{l:"Hay rutina y estabilidad",d:"S"},{l:"Innovo y experimento",d:"C"}]},
+  {t:"Mi mayor debilidad es ser demasiado…",o:[{l:"Directo/a",d:"D"},{l:"Cauteloso/a",d:"C"},{l:"Indeciso/a",d:"S"},{l:"Confiado/a",d:"I"}]},
+  {t:"Tomo decisiones basado/a en…",o:[{l:"Datos y evidencia",d:"C"},{l:"Intuición y emoción",d:"I"},{l:"Eficiencia y velocidad",d:"D"},{l:"Impacto en las personas",d:"S"}]},
+  {t:"En equipos, soy el/la…",o:[{l:"Ejecutor/a de resultados",d:"D"},{l:"Conector/a del grupo",d:"I"},{l:"Planificador/a detallado/a",d:"C"},{l:"Apoyo incondicional",d:"S"}]},
+  {t:"Me frustra profundamente…",o:[{l:"La ineficiencia",d:"D"},{l:"La falta de armonía",d:"S"},{l:"La falta de estructura",d:"C"},{l:"La burocracia que frena ideas",d:"I"}]},
+  {t:"Mi rol ideal me permite…",o:[{l:"Lograr resultados tangibles",d:"D"},{l:"Construir relaciones sólidas",d:"I"},{l:"Seguir lineamientos claros",d:"C"},{l:"Liderar la innovación",d:"I"}]},
+  {t:"Me da energía…",o:[{l:"Ganar y competir",d:"D"},{l:"Crear e inspirar",d:"I"},{l:"Ayudar y sostener",d:"S"},{l:"Analizar y resolver",d:"C"}]},
+  {t:"Al delegar, soy…",o:[{l:"Colaborativo/a",d:"S"},{l:"Controlador/a",d:"D"},{l:"Flexible con el cómo",d:"I"},{l:"Muy específico/a en el qué",d:"C"}]},
+  {t:"Prefiero retroalimentación que sea…",o:[{l:"Constructiva y empática",d:"S"},{l:"Detallada y con ejemplos",d:"C"},{l:"Entusiasta y motivadora",d:"I"},{l:"Directa y sin rodeos",d:"D"}]},
+  {t:"Mi enfoque natural al riesgo es…",o:[{l:"Calculado — evalúo antes de moverme",d:"D"},{l:"Cauteloso — prefiero la certeza",d:"C"},{l:"Espontáneo — me lanzo y aprendo",d:"I"},{l:"Reflexivo — necesito consenso primero",d:"S"}]},
+  {t:"Tengo más éxito cuando…",o:[{l:"Logro algo concreto y medible",d:"D"},{l:"Me valoran y aprecian",d:"I"},{l:"Sigo el proceso establecido",d:"C"},{l:"Sé que ayudé a alguien",d:"S"}]},
+  {t:"A largo plazo, quiero…",o:[{l:"Alcanzar una posición de impacto",d:"D"},{l:"Construir comunidad y legado",d:"I"},{l:"Crear seguridad y estabilidad",d:"S"},{l:"Dejar algo bien hecho y duradero",d:"C"}]}
+];
+
+const COLORS={D:"#B83232",I:"#1A6FA8",S:"#1A7A42",C:"#5E2D8A"};
+const AC={D:"#B83232",Di:"#C04A20",DI:"#C85F18",Id:"#C87818",I:"#1A6FA8",Is:"#1A7A5A",IS:"#155A8A",Si:"#156B50",S:"#1A7A42",Sc:"#0A5940",SC:"#0E6B5E",Cs:"#2D4F8A",C:"#5E2D8A",Cd:"#7A2D72",CD:"#8B2D5A",Dc:"#9E2D42"};
+
+const A={
+  D:{name:"El Retador",code:"D — Dominance",color:AC.D,
+    desc:"Vive para la acción. Directo, exigente consigo mismo y con los demás, El Retador empuja límites y transforma la inercia en movimiento. No le teme al conflicto — a veces lo busca para generar el cambio que otros evitan.",
+    frase:"'No vine a pedir permiso. Vine a mover las cosas.'",
+    fortalezas:["Toma decisiones rápidas bajo presión sin paralizarse","Genera urgencia y empuja al equipo hacia resultados concretos","Confronta lo que otros evitan con claridad y sin rodeos"],
+    ciegos:["Puede atropellar a otros por avanzar demasiado rápido","Tiende a saltarse el proceso cuando está convencido de tener razón","Le cuesta escuchar perspectivas que ralentizan la acción"],
+    energiza:["Competencia y retos de alto impacto","Autonomía para decidir y ejecutar","Logros visibles y medibles"],
+    drena:["Reuniones largas sin decisiones claras","Burocracia y procesos lentos","Tener que justificar cada movimiento"],
+    relaciones:[{k:"D",txt:"<strong>Con otro Retador:</strong> Habrá chispa y posiblemente choque. Funcionan cuando hay roles claros."},{k:"I",txt:"<strong>Con El Imán:</strong> El uno genera energía, el otro la dirige. Buena dupla si respetan ritmos."},{k:"S",txt:"<strong>Con El Ancla:</strong> Tensión natural entre velocidad y estabilidad. Cuando se respetan, se complementan muy bien."},{k:"C",txt:"<strong>Con El Estratega:</strong> Uno quiere actuar, el otro analizar. Juntos cubren los puntos ciegos del otro."}],
+    traits:["Dominante","Decidido","Competitivo","Independiente","Directo"]},
+
+  Di:{name:"El Impulsor",code:"Di — Driver",color:AC.Di,
+    desc:"Tiene la fuerza de El Retador pero con una chispa social que le permite moverse en grupos con facilidad. El Impulsor no solo quiere ganar — quiere que otros vean que ganó. Dirige con energía y cierta dosis de carisma estratégico.",
+    frase:"'Yo marco el ritmo. Los demás deciden si se suben al tren.'",
+    fortalezas:["Impulsa la acción con energía contagiosa y dirección clara","Sabe cuándo usar el carisma para vencer resistencias","Combina decisión con capacidad de mover a su entorno"],
+    ciegos:["Puede usar el carisma para evitar conversaciones difíciles","Tiende a necesitar validación externa más de lo que admite","Le cuesta compartir el protagonismo con otros líderes"],
+    energiza:["Proyectos donde puede liderar y ser visible","Retos que combinan resultados y reconocimiento","Equipos que responden a su ritmo y energía"],
+    drena:["Liderazgos compartidos sin claridad de rol","Entornos donde el mérito no se reconoce públicamente","Procesos lentos sin victorias visibles en el camino"],
+    relaciones:[{k:"D",txt:"<strong>Con El Retador:</strong> Mucha energía compartida pero pueden competir por el centro. Roles claros son clave."},{k:"I",txt:"<strong>Con El Imán:</strong> Combinación natural — el Impulsor dirige, el Imán conecta. Dupla efectiva."},{k:"S",txt:"<strong>Con El Ancla:</strong> El Ancla lo sostiene cuando el Impulsor va demasiado rápido. Buen complemento."},{k:"C",txt:"<strong>Con El Estratega:</strong> Tensión posible — el Estratega frena lo que el Impulsor quiere acelerar. Valiosos cuando se escuchan."}],
+    traits:["Enérgico","Decidido","Carismático","Orientado a resultados","Visible"]},
+
+  DI:{name:"El Pionero",code:"DI — Initiator",color:AC.DI,
+    desc:"Tiene la determinación de El Retador y el magnetismo de El Imán. El Pionero no solo abre caminos — convence a otros de que el camino vale la pena. Nació para liderar cambios que otros aún no se atreven a imaginar.",
+    frase:"'El futuro no se espera. Se construye — y se construye con gente.'",
+    fortalezas:["Combina visión audaz con capacidad real de mover a las personas","Toma la iniciativa antes que nadie y arrastra al equipo con entusiasmo","Transforma ideas abstractas en proyectos con impulso real"],
+    ciegos:["Puede avanzar tan rápido que deja a otros sin contexto","Tiende a minimizar los riesgos por exceso de confianza","Le cuesta detenerse a consolidar antes de lanzar lo siguiente"],
+    energiza:["Proyectos nuevos con alta visibilidad e impacto","Autonomía para decidir y comunicar","Reconocimiento de su liderazgo y visión"],
+    drena:["Rutina sin variedad ni retos nuevos","Tener que operar en segundo plano","Procesos que frenan la acción antes de validar"],
+    relaciones:[{k:"D",txt:"<strong>Con El Retador:</strong> Afinidad natural pero pueden competir por protagonismo. Roles claros son clave."},{k:"I",txt:"<strong>Con El Imán:</strong> Mucha energía compartida. El riesgo es que nadie gestione la ejecución detallada."},{k:"S",txt:"<strong>Con El Ancla:</strong> Complemento excelente. El Ancla sostiene lo que El Pionero construye a alta velocidad."},{k:"C",txt:"<strong>Con El Estratega:</strong> El Estratega le pone rigor a las ideas del Pionero. Pueden lograr cosas extraordinarias."}],
+    traits:["Iniciador","Emprendedor","Persuasivo","Audaz","Carismático"]},
+
+  Id:{name:"El Motivador",code:"Id — Motivator",color:AC.Id,
+    desc:"La diferencia con El Pionero está en el centro de gravedad: este perfil pone a las personas primero. El Motivador usa su influencia y entusiasmo para despertar lo mejor de quienes lo rodean, y su orientación a resultados le da foco sin perder la calidez.",
+    frase:"'El mejor resultado no es el que yo logro. Es el que logras tú cuando confías en ti.'",
+    fortalezas:["Inspira con autenticidad y genera compromiso genuino en otros","Sabe equilibrar el entusiasmo con la orientación a resultados","Conecta la visión del equipo con la motivación individual de cada persona"],
+    ciegos:["Puede prometer más de lo que puede sostener en el tiempo","Le cuesta mantener el foco cuando muchas personas necesitan su atención","Tiende a suavizar los mensajes difíciles para no desmotivar"],
+    energiza:["Ver a otros crecer y alcanzar sus metas con su apoyo","Proyectos con propósito claro e impacto humano visible","Entornos donde puede inspirar y también medir resultados"],
+    drena:["Ambientes donde los resultados se miden sin considerar a las personas","Líderes que deshumanizan los procesos","Falta de progreso visible a pesar del esfuerzo colectivo"],
+    relaciones:[{k:"D",txt:"<strong>Con El Retador:</strong> El Motivador puede humanizar el liderazgo del Retador ante el equipo. Combinación poderosa."},{k:"I",txt:"<strong>Con El Imán:</strong> Mucha afinidad. El riesgo es que ambos generen entusiasmo sin cerrar con resultados."},{k:"S",txt:"<strong>Con El Ancla:</strong> Muy buena relación — ambos cuidan a las personas. Juntos pueden evitar conversaciones difíciles."},{k:"C",txt:"<strong>Con El Estratega:</strong> El Estratega le da rigor; el Motivador le da humanidad. Complemento muy completo."}],
+    traits:["Inspirador","Orientado a personas","Entusiasta","Enfocado en resultados","Empático"]},
+
+  I:{name:"El Imán",code:"I — Influence",color:AC.I,
+    desc:"Entra a un cuarto y lo cambia. El Imán conecta, entusiasma y mueve a las personas con su energía natural. Su superpoder es hacer que otros quieran seguirlo — no por autoridad, sino por magnetismo puro.",
+    frase:"'Si no te emociona, no te mueve. Y si te mueve, te transforma.'",
+    fortalezas:["Inspira y motiva con autenticidad y energía genuina","Construye redes y relaciones con facilidad y rapidez","Vende ideas — las propias y las del equipo — con convicción"],
+    ciegos:["Puede comprometerse con más de lo que puede cumplir","Le cuesta la disciplina de los detalles y el seguimiento","Tiende a evitar conversaciones difíciles para mantener la armonía"],
+    energiza:["Reconocimiento y apreciación genuina","Ambientes sociales, creativos y dinámicos","Proyectos nuevos con alto componente humano"],
+    drena:["Trabajo solitario y repetitivo","Crítica que siente como rechazo personal","Entornos rígidos sin espacio para improvisar"],
+    relaciones:[{k:"D",txt:"<strong>Con El Retador:</strong> Combinación poderosa — uno tiene el impulso, el otro lo convierte en movimiento colectivo."},{k:"I",txt:"<strong>Con otro Imán:</strong> Mucha energía y conexión. El riesgo es que nadie se encargue del seguimiento."},{k:"S",txt:"<strong>Con El Ancla:</strong> El Ancla le da raíz; el Imán le da proyección. Una de las mejores combinaciones."},{k:"C",txt:"<strong>Con El Estratega:</strong> Mundos distintos. Con respeto mutuo, forman un equipo muy completo."}],
+    traits:["Carismático","Optimista","Persuasivo","Expresivo","Conectivo"]},
+
+  Is:{name:"El Animador",code:"Is — Encourager",color:AC.Is,
+    desc:"Tiene el entusiasmo de El Imán pero su corazón late más cerca de las personas. El Animador no solo inspira — acompaña. Usa su energía para levantar el ánimo del equipo y crear ambientes donde todos se sienten vistos y valorados.",
+    frase:"'No necesito que seas perfecto. Necesito que sigas intentándolo.'",
+    fortalezas:["Crea ambientes emocionalmente seguros donde otros se atreven a crecer","Detecta cuándo alguien necesita apoyo antes de que lo pida","Combina entusiasmo con genuino interés por el bienestar de los demás"],
+    ciegos:["Puede priorizar el ánimo del equipo sobre los resultados necesarios","Le cuesta dar retroalimentación crítica sin suavizarla demasiado","Tiende a absorber las emociones negativas de otros, lo que lo agota"],
+    energiza:["Ver a otros superar sus límites con su apoyo","Entornos colaborativos con alta cohesión emocional","Proyectos que combinan creatividad con impacto humano"],
+    drena:["Ambientes fríos, competitivos y sin reconocimiento","Tener que priorizar eficiencia sobre bienestar","Conflictos sostenidos sin resolución"],
+    relaciones:[{k:"D",txt:"<strong>Con El Retador:</strong> El Animador puede ser el puente emocional que el Retador necesita con su equipo."},{k:"I",txt:"<strong>Con El Imán:</strong> Gran afinidad. Juntos crean ambientes muy energizantes pero necesitan anclar resultados."},{k:"S",txt:"<strong>Con El Ancla:</strong> Relación muy cálida y natural. Ambos ponen a las personas primero."},{k:"C",txt:"<strong>Con El Estratega:</strong> El Animador le da dimensión humana al Estratega. Buena combinación con respeto mutuo."}],
+    traits:["Empático","Entusiasta","Motivador","Cálido","Colaborativo"]},
+
+  IS:{name:"El Mentor",code:"IS — Counselor",color:AC.IS,
+    desc:"Inspira desde la conexión, no desde la jerarquía. El Mentor combina el entusiasmo de El Imán con la calidez profunda de El Ancla para convertirse en la persona que otros buscan cuando necesitan crecer.",
+    frase:"'Mi mayor logro no es lo que yo he hecho. Es lo que tú hiciste porque yo creí en ti.'",
+    fortalezas:["Crea lazos genuinos de confianza que generan lealtad duradera","Sabe leer el estado emocional de otros y adaptar su comunicación","Acompaña el crecimiento de las personas con paciencia y entusiasmo real"],
+    ciegos:["Puede priorizar la armonía sobre las conversaciones necesarias","Le cuesta mantener límites con personas que demandan mucho","Tiende a evitar decir verdades incómodas para proteger la relación"],
+    energiza:["Acompañar el desarrollo de personas con potencial","Ambientes colaborativos con relaciones de largo plazo","Proyectos con impacto humano claro y visible"],
+    drena:["Entornos altamente competitivos y fríos","Tomar decisiones que afectan negativamente a personas cercanas","Falta de reciprocidad en las relaciones que construye"],
+    relaciones:[{k:"D",txt:"<strong>Con El Retador:</strong> El Mentor puede humanizar el liderazgo del Retador. Buena combinación si se respetan."},{k:"I",txt:"<strong>Con El Imán:</strong> Muy buena química. El riesgo es falta de enfoque en resultados concretos."},{k:"S",txt:"<strong>Con El Ancla:</strong> Relación muy armoniosa. Pueden necesitar alguien externo que los empuje a decidir."},{k:"C",txt:"<strong>Con El Estratega:</strong> El Mentor aporta la dimensión humana que al Estratega le cuesta ver."}],
+    traits:["Empático","Inspirador","Cálido","Desarrollador de personas","Colaborativo"]},
+
+  Si:{name:"El Compañero",code:"Si — Harmonizer",color:AC.Si,
+    desc:"Fiel, presente y generoso. El Compañero es el perfil que hace que los equipos funcionen desde adentro — no desde el liderazgo visible, sino desde la conexión constante, el apoyo silencioso y la capacidad de hacer que todos se sientan parte.",
+    frase:"'No necesito el crédito. Necesito saber que el equipo está bien.'",
+    fortalezas:["Crea cohesión de equipo desde la cercanía y el apoyo cotidiano","Escucha con profundidad genuina y hace sentir valorado a quien habla","Es el pegamento invisible que sostiene las relaciones en momentos difíciles"],
+    ciegos:["Puede sacrificar sus propias necesidades por mantener la armonía del grupo","Le cuesta decir no, incluso cuando está al límite de su capacidad","Tiende a no visibilizar sus propias contribuciones"],
+    energiza:["Relaciones de confianza profunda y largo plazo","Saber que su presencia hace diferencia en las personas cercanas","Entornos donde el trabajo en equipo es genuino y reconocido"],
+    drena:["Ambientes individualistas donde cada quien va por su cuenta","Conflictos no resueltos que generan tensión sostenida","Falta de reconocimiento a su contribución silenciosa"],
+    relaciones:[{k:"D",txt:"<strong>Con El Retador:</strong> Funciona cuando el Retador aprende a valorar el sostén silencioso que El Compañero aporta."},{k:"I",txt:"<strong>Con El Imán:</strong> El Imán le da visibilidad; el Compañero le da profundidad. Muy buena combinación."},{k:"S",txt:"<strong>Con El Ancla:</strong> Gran armonía. Ambos son leales y estables. Pueden evitar juntos los cambios necesarios."},{k:"C",txt:"<strong>Con El Estratega:</strong> Combinación tranquila y funcional. Ambos son cuidadosos y poco impulsivos."}],
+    traits:["Leal","Empático","Colaborativo","Generoso","Discreto"]},
+
+  S:{name:"El Ancla",code:"S — Steadiness",color:AC.S,
+    desc:"La persona en quien todos confían cuando las cosas se complican. El Ancla no necesita el reflector — prefiere construir desde la consistencia, la lealtad y el apoyo genuino a los demás.",
+    frase:"'No siempre soy el más ruidoso. Pero siempre estoy cuando importa.'",
+    fortalezas:["Genera ambientes de confianza y seguridad psicológica genuina","Se mantiene estable bajo presión cuando otros se desestabilizan","Escucha profundo — hace que los demás se sientan realmente vistos"],
+    ciegos:["Le cuesta decir no y puede sobrecargar su propio límite","Evita conflictos necesarios por preservar la armonía","Resiste los cambios incluso cuando son necesarios y beneficiosos"],
+    energiza:["Relaciones estables y de largo plazo","Ayudar a otros a crecer y resolver sus problemas","Entornos predecibles con roles claros"],
+    drena:["Cambios frecuentes e imprevistos","Conflictos directos y confrontaciones","Presión para decidir rápido sin información completa"],
+    relaciones:[{k:"D",txt:"<strong>Con El Retador:</strong> Funciona cuando el Retador aprende a pausar y el Ancla aprende a expresar sus límites."},{k:"I",txt:"<strong>Con El Imán:</strong> El Ancla le da raíz al Imán, quien le da proyección al Ancla. Una de las mejores combinaciones."},{k:"S",txt:"<strong>Con otro Ancla:</strong> Gran armonía, pero pueden evitar juntos las conversaciones difíciles que el equipo necesita."},{k:"C",txt:"<strong>Con El Estratega:</strong> Ambos son cuidadosos y no impulsivos. Juntos construyen cosas sólidas y duraderas."}],
+    traits:["Leal","Paciente","Empático","Estable","Confiable"]},
+
+  Sc:{name:"El Guardián",code:"Sc — Supporter",color:AC.Sc,
+    desc:"Protege lo que vale la pena proteger. El Guardián combina la calidez de El Ancla con el rigor metódico de El Constructor para convertirse en el custodio de los procesos, las relaciones y los estándares que dan estabilidad al equipo.",
+    frase:"'Las cosas buenas no se improvisan. Se cuidan, se sostienen y se defienden.'",
+    fortalezas:["Mantiene los procesos y relaciones clave con consistencia y dedicación","Detecta cuando algo importante está en riesgo antes que los demás","Genera confianza sostenida a través de la coherencia entre lo que dice y hace"],
+    ciegos:["Puede ser demasiado resistente al cambio incluso cuando es necesario","Le cuesta priorizar cuando todo le parece igualmente importante de proteger","Tiende a no comunicar sus propias necesidades por no querer ser una carga"],
+    energiza:["Saber que lo que construye dura en el tiempo","Equipos donde la lealtad y el compromiso son valores reales","Claridad sobre qué hay que proteger y por qué"],
+    drena:["Cambios bruscos que destruyen lo construido sin reconocerlo","Falta de reciprocidad en el cuidado que él prodiga","Ambientes caóticos sin estructura ni continuidad"],
+    relaciones:[{k:"D",txt:"<strong>Con El Retador:</strong> Tensión posible — el Guardián protege lo que el Retador quiere cambiar. Valiosos cuando se escuchan."},{k:"I",txt:"<strong>Con El Imán:</strong> El Imán le inyecta energía; el Guardián le da continuidad y sustancia. Buena combinación."},{k:"S",txt:"<strong>Con El Ancla:</strong> Gran afinidad. Ambos valoran la estabilidad. Pueden necesitar alguien que los empuje a renovarse."},{k:"C",txt:"<strong>Con El Estratega:</strong> Combinación muy sólida. Ambos son metódicos y orientados a la calidad sostenida."}],
+    traits:["Protector","Leal","Metódico","Consistente","Confiable"]},
+
+  SC:{name:"El Constructor",code:"SC — Stabilizer",color:AC.SC,
+    desc:"No necesita el reconocimiento inmediato. El Constructor trabaja con paciencia, método y lealtad para edificar cosas que duran. Sus resultados no son explosivos — son permanentes.",
+    frase:"'Lo que vale la pena construir, vale la pena construirlo bien y construirlo junto.'",
+    fortalezas:["Crea sistemas y procesos que funcionan con consistencia en el tiempo","Genera confianza a través de la coherencia entre lo que dice y hace","Sostiene proyectos largos sin perder el ritmo ni la calidad"],
+    ciegos:["Puede resistir cambios necesarios por apego al proceso establecido","Le cuesta tomar decisiones rápidas cuando el contexto cambia","Tiende a no visibilizar sus propios logros ni reclamar su mérito"],
+    energiza:["Proyectos con impacto a largo plazo y criterios claros","Equipos estables con relaciones de confianza consolidadas","Claridad en roles, expectativas y procesos"],
+    drena:["Cambios constantes sin justificación clara","Ambigüedad sobre los estándares de calidad esperados","Entornos donde se valora la velocidad sobre la solidez"],
+    relaciones:[{k:"D",txt:"<strong>Con El Retador:</strong> Tensión natural entre velocidad y solidez. Funcionan cuando cada uno respeta lo que el otro aporta."},{k:"I",txt:"<strong>Con El Imán:</strong> El Imán le inyecta energía; el Constructor le da sustancia a las ideas del Imán."},{k:"S",txt:"<strong>Con El Ancla:</strong> Gran armonía. El riesgo es que entre ambos eviten los cambios que el equipo necesita hacer."},{k:"C",txt:"<strong>Con El Estratega:</strong> Excelente alineación en valores de calidad y método. Construyen cosas sólidas y bien pensadas."}],
+    traits:["Metódico","Leal","Sistemático","Consistente","Confiable"]},
+
+  Cs:{name:"El Editor",code:"Cs — Analyst",color:AC.Cs,
+    desc:"Tiene el rigor de El Estratega pero con una dimensión humana que lo hace más accesible. El Editor evalúa, depura y mejora — tanto los procesos como las relaciones — con una mirada crítica que siempre busca la mejor versión posible.",
+    frase:"'No es que sea exigente. Es que sé lo que es posible cuando se hace bien.'",
+    fortalezas:["Combina pensamiento analítico con sensibilidad hacia las personas involucradas","Mejora procesos y sistemas sin perder de vista el impacto humano","Ofrece retroalimentación rigurosa pero con cuidado genuino"],
+    ciegos:["Puede caer en el perfeccionismo y retrasar decisiones necesarias","Le cuesta aceptar que suficientemente bueno a veces es suficiente","Puede ser percibido como crítico incluso cuando su intención es ayudar"],
+    energiza:["Proyectos donde puede mejorar algo que ya existe y hacerlo excelente","Equipos que valoran la retroalimentación y el rigor","Claridad en los criterios de calidad y en los plazos"],
+    drena:["Trabajo de baja calidad presentado como aceptable","Ambientes donde la velocidad siempre gana sobre la precisión","Falta de reconocimiento a su contribución metódica"],
+    relaciones:[{k:"D",txt:"<strong>Con El Retador:</strong> El Editor puede frenar al Retador con su análisis, pero también puede evitarle errores costosos."},{k:"I",txt:"<strong>Con El Imán:</strong> El Editor le da rigor a las ideas del Imán; el Imán le da visibilidad al trabajo del Editor."},{k:"S",txt:"<strong>Con El Ancla:</strong> Muy buena combinación. Ambos son cuidadosos y no impulsivos. Construyen con solidez."},{k:"C",txt:"<strong>Con El Estratega:</strong> Gran afinidad intelectual. Pueden atascarse en el análisis si no hay plazos claros."}],
+    traits:["Analítico","Riguroso","Empático","Orientado a la mejora","Metódico"]},
+
+  C:{name:"El Estratega",code:"C — Conscientiousness",color:AC.C,
+    desc:"Donde otros ven una decisión, El Estratega ve un sistema. Analítico, exigente con la calidad y orientado a la precisión, este perfil resuelve lo que otros no pueden porque está dispuesto a ir más profundo.",
+    frase:"'Los detalles no son obstáculos. Son donde vive la verdad.'",
+    fortalezas:["Resuelve problemas complejos con lógica y metodología sólida","Detecta errores e inconsistencias que otros no ven","Mantiene estándares de calidad aunque haya presión para bajarlos"],
+    ciegos:["Puede paralizar decisiones al querer información perfecta","Le cuesta comunicar sus conclusiones de forma simple y accesible","Puede ser percibido como frío o distante por su enfoque en los hechos"],
+    energiza:["Problemas complejos que requieren análisis profundo","Claridad en las expectativas y criterios de calidad","Tiempo para investigar antes de decidir"],
+    drena:["Decisiones precipitadas sin datos suficientes","Ambientes caóticos sin estructura ni proceso","Ser evaluado por carisma en lugar de por resultados"],
+    relaciones:[{k:"D",txt:"<strong>Con El Retador:</strong> Tensión frecuente — uno quiere actuar, el otro analizar. Juntos se complementan brillantemente."},{k:"I",txt:"<strong>Con El Imán:</strong> Mundos distintos. Con respeto mutuo, forman un equipo muy completo."},{k:"S",txt:"<strong>Con El Ancla:</strong> Muy buena combinación. Ambos cuidadosos y no impulsivos. Construyen cosas sólidas."},{k:"C",txt:"<strong>Con otro Estratega:</strong> Puede funcionar brillante o atascarse en el análisis. Necesitan un plazo claro para decidir."}],
+    traits:["Analítico","Preciso","Sistemático","Detallista","Riguroso"]},
+
+  Cd:{name:"El Perfeccionista",code:"Cd — Questioner",color:AC.Cd,
+    desc:"Tiene la profundidad analítica de El Estratega pero con una orientación práctica que lo impulsa a actuar una vez que ha analizado lo suficiente. El Perfeccionista no se conforma con lo mediocre — y cuando decide moverse, lo hace con convicción.",
+    frase:"'Prefiero hacerlo bien una vez que rápido dos veces.'",
+    fortalezas:["Combina análisis riguroso con capacidad de decidir cuando tiene la información necesaria","Define estándares altos y trabaja con determinación para alcanzarlos","Detecta los riesgos ocultos que otros ignoran por querer avanzar rápido"],
+    ciegos:["Su búsqueda de perfección puede retrasar proyectos que necesitan avanzar","Le cuesta delegar tareas que considera críticas para la calidad","Puede ser percibido como obstruccionista cuando en realidad está siendo riguroso"],
+    energiza:["Proyectos donde la calidad y la ejecución son igualmente valoradas","Autonomía para definir los estándares y el método de trabajo","Retos que requieren tanto pensamiento profundo como acción concreta"],
+    drena:["Presión para entregar trabajo que no cumple sus estándares","Entornos donde se aceptan errores sistemáticos sin corrección","Ser ignorado en su análisis y ver que se repiten los mismos errores"],
+    relaciones:[{k:"D",txt:"<strong>Con El Retador:</strong> Pueden chocar — el Retador quiere velocidad, el Perfeccionista quiere calidad. Pero se necesitan."},{k:"I",txt:"<strong>Con El Imán:</strong> El Imán puede parecerle impreciso, pero puede ayudarle a comunicar mejor sus ideas."},{k:"S",txt:"<strong>Con El Ancla:</strong> El Ancla ejecuta con cuidado lo que el Perfeccionista define. Combinación sólida."},{k:"C",txt:"<strong>Con El Estratega:</strong> Gran afinidad intelectual. El riesgo es exceso de análisis sin suficiente acción."}],
+    traits:["Exigente","Analítico","Determinado","Orientado a calidad","Riguroso"]},
+
+  CD:{name:"El Arquitecto",code:"CD — Skeptic",color:AC.CD,
+    desc:"No acepta mediocridad — ni en sí mismo ni en su entorno. El Arquitecto combina la ambición de El Retador con la exigencia analítica de El Estratega para construir sistemas y soluciones de alta calidad con visión de largo plazo.",
+    frase:"'Bueno no es suficiente. Hacerlo bien es el único estándar que conozco.'",
+    fortalezas:["Define estándares de calidad elevados y los sostiene con convicción","Combina pensamiento estratégico con orientación a la acción","Detecta fallas en sistemas y procesos antes de que se conviertan en problemas"],
+    ciegos:["Sus estándares altos pueden desmotivar a quienes no los comparten","Puede ser percibido como inflexible o crítico en exceso","Le cuesta celebrar lo logrado antes de pasar al siguiente reto"],
+    energiza:["Proyectos complejos donde calidad y resultados van de la mano","Autonomía para definir el estándar y el método","Retos intelectuales con impacto real y medible"],
+    drena:["Trabajo superficial o de baja calidad","Equipos que no se responsabilizan de sus resultados","Presión para entregar sin el tiempo para hacerlo bien"],
+    relaciones:[{k:"D",txt:"<strong>Con El Retador:</strong> Afinidad en la ambición. El reto es que ambos pueden ser muy directos entre sí."},{k:"I",txt:"<strong>Con El Imán:</strong> El Imán puede parecerle poco riguroso, pero puede ayudarle a comunicar mejor sus ideas."},{k:"S",txt:"<strong>Con El Ancla:</strong> El Ancla ejecuta con cuidado lo que el Arquitecto diseña. Combinación sólida y confiable."},{k:"C",txt:"<strong>Con El Estratega:</strong> Gran afinidad intelectual. El riesgo es exceso de análisis y poca acción conjunta."}],
+    traits:["Exigente","Analítico","Determinado","Orientado a calidad","Estratégico"]},
+
+  Dc:{name:"El Calculador",code:"Dc — Captain",color:AC.Dc,
+    desc:"Actúa con determinación pero nunca a ciegas. El Calculador tiene la energía y el impulso de El Retador, pero su dimensión analítica lo obliga a evaluar antes de moverse — lo que lo hace más preciso y menos predecible que otros perfiles de alto desempeño.",
+    frase:"'No me muevo rápido porque sí. Me muevo rápido cuando ya sé que el movimiento vale.'",
+    fortalezas:["Toma decisiones rápidas sin sacrificar la precisión necesaria","Evalúa riesgos con frialdad y actúa con convicción cuando tiene los datos","Combina la urgencia de un líder de resultados con la disciplina de un analista"],
+    ciegos:["Puede parecer frío o calculador cuando en realidad está siendo estratégico","Le cuesta mostrar vulnerabilidad o pedir apoyo cuando lo necesita","Tiende a subestimar la dimensión emocional de las decisiones que toma"],
+    energiza:["Retos que requieren velocidad y precisión al mismo tiempo","Autonomía total para decidir con base en su propio análisis","Entornos donde los resultados hablan por sí mismos"],
+    drena:["Decisiones basadas en intuición o relaciones sin respaldo analítico","Tener que justificar sus conclusiones ante quienes no entienden el análisis","Ambientes donde la política pesa más que los resultados"],
+    relaciones:[{k:"D",txt:"<strong>Con El Retador:</strong> Muy alineados en la orientación a resultados. El Calculador aporta el rigor que al Retador a veces le falta."},{k:"I",txt:"<strong>Con El Imán:</strong> Mundos distintos — el Calculador es racional, el Imán es emocional. Pero juntos son muy completos."},{k:"S",txt:"<strong>Con El Ancla:</strong> El Ancla lo humaniza. El Calculador le da dirección estratégica al Ancla."},{k:"C",txt:"<strong>Con El Estratega:</strong> Gran complemento — comparten el rigor pero el Calculador tiene más urgencia de acción."}],
+    traits:["Estratégico","Decidido","Analítico","Preciso","Orientado a resultados"]}
+};
+
+let screen='intro',cur=0,ans=new Array(28).fill(null);
+
+function scores(){
+  const s={D:0,I:0,S:0,C:0};
+  ans.forEach((a,i)=>{if(a!==null)s[Q[i].o[a].d]++;});
+  return s;
+}
+
+function getArch(){
+  const s=scores();
+  const sorted=Object.entries(s).sort((a,b)=>b[1]-a[1]);
+  const t1=sorted[0][0],t2=sorted[1][0];
+  const d1=sorted[0][1],d2=sorted[1][1];
+  const diff=d1-d2;
+  let arch,dual=false;
+  if(diff>=5){arch=t1;}
+  else if(diff>=2){arch=t1+t2.toLowerCase();}
+  else{arch=t1+t2;dual=true;}
+  if(!A[arch]){
+    if(A[t1+t2])arch=t1+t2;
+    else if(A[t2+t1])arch=t2+t1;
+    else arch=t1;
+  }
+  return{arch,dual,top1:t1,top2:t2,diff};
+}
+
+function radarSVG(s,archColor){
+  const total=Object.values(s).reduce((a,b)=>a+b,0)||1;
+  const cx=130,cy=130,maxR=90;
+  const corners=[{k:'D',a:-90},{k:'I',a:0},{k:'S',a:90},{k:'C',a:180}];
+  const pts=corners.map(c=>{const r=(s[c.k]/total)*maxR+16,rad=c.a*Math.PI/180;return[cx+r*Math.cos(rad),cy+r*Math.sin(rad)];});
+  const poly=pts.map(p=>p.map(v=>v.toFixed(1)).join(',')).join(' ');
+  const gC=[25,50,70,90].map(r=>`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(0,0,0,0.05)" stroke-width="1"/>`).join('');
+  const ax=`<line x1="${cx}" y1="${cy-98}" x2="${cx}" y2="${cy+98}" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><line x1="${cx-98}" y1="${cy}" x2="${cx+98}" y2="${cy}" stroke="rgba(0,0,0,0.07)" stroke-width="1"/>`;
+  const lbls=[{k:'D',x:cx,y:cy-110,c:COLORS.D},{k:'I',x:cx+112,y:cy,c:COLORS.I},{k:'S',x:cx,y:cy+114,c:COLORS.S},{k:'C',x:cx-112,y:cy,c:COLORS.C}];
+  const pcts=corners.map(c=>Math.round(s[c.k]/total*100));
+  const lt=lbls.map((l,i)=>`<text x="${l.x}" y="${l.y}" text-anchor="middle" dominant-baseline="middle" font-family="DM Sans,sans-serif" font-size="12" font-weight="500" fill="${l.c}">${l.k} ${pcts[i]}%</text>`).join('');
+  const dots=pts.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="4" fill="${archColor}"/>`).join('');
+  return`<svg viewBox="0 0 260 260" width="200" height="200">${gC}${ax}<polygon points="${poly}" fill="${archColor}" fill-opacity="0.15" stroke="${archColor}" stroke-width="2"/>${dots}${lt}</svg>`;
+}
+
+function dualNote(t1,t2,diff){
+  const n1=A[t1]?.name||t1,n2=A[t2]?.name||t2;
+  const int=diff<=1?"casi idéntica fuerza":"fuerza muy similar";
+  return`<div class="dual-note"><strong>Tienes dos dimensiones igualmente dominantes.</strong> Presentas ${int} en <strong>${t1} (${n1})</strong> y <strong>${t2} (${n2})</strong>. Esto indica que adaptas tu estilo según el contexto: bajo presión o ante retos nuevos, probablemente emerge más el lado <strong>${t1}</strong>; en entornos de confianza o colaboración, aparece más el <strong>${t2}</strong>. Esa flexibilidad no es inconsistencia — es una ventaja real.</div>`;
+}
+
+function renderIntro(){
+  return`<div class="intro"><div class="brand">Conversational IQ · Umbra Consulting</div><h1>Descubre tu estilo<br>de personalidad</h1><p>28 preguntas · Aproximadamente 5 minutos<br>Responde según cómo eres,<br>no como quisieras ser.</p><div class="disc-row"><div class="disc-dot"><div class="dot" style="background:${COLORS.D}">D</div><span>Dominance</span></div><div class="disc-dot"><div class="dot" style="background:${COLORS.I}">I</div><span>Influence</span></div><div class="disc-dot"><div class="dot" style="background:${COLORS.S}">S</div><span>Steadiness</span></div><div class="disc-dot"><div class="dot" style="background:${COLORS.C}">C</div><span>Conscientiousness</span></div></div><button class="btn-primary" onclick="start()">Comenzar →</button></div>`;
+}
+
+function renderTest(){
+  const q=Q[cur],pct=Math.round(cur/28*100);
+  return`<div><div class="prog-wrap"><div class="prog-meta"><span class="prog-label">Conversational IQ</span><span class="prog-count">${cur+1} / 28</span></div><div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div></div><div class="q-eyebrow">Pregunta ${cur+1}</div><div class="q-text">${q.t}</div><div class="options">${q.o.map((o,i)=>`<button class="opt${ans[cur]===i?' sel':''}" onclick="pick(${i})"><span class="opt-circle"></span>${o.l}</button>`).join('')}</div><div class="nav">${cur>0?`<button class="btn-back" onclick="back()">← Atrás</button>`:'<span></span>'}<button class="btn-next" onclick="next()" ${ans[cur]===null?'disabled':''}>${cur===27?'Ver resultado →':'Siguiente →'}</button></div></div>`;
+}
+
+function renderResult(){
+  const s=scores(),{arch,dual,top1,top2,diff}=getArch();
+  const info=A[arch]||A[top1]||A['D'];
+  const total=Object.values(s).reduce((a,b)=>a+b,0)||1;
+  const bars=['D','I','S','C'].map(k=>{const pct=Math.round(s[k]/total*100);return`<div class="score-row"><span class="score-k" style="color:${COLORS[k]}">${k}</span><div class="score-track"><div class="score-bar" style="width:${pct}%;background:${COLORS[k]}"></div></div><span class="score-pct">${pct}%</span></div>`;}).join('');
+  const relRows=info.relaciones.map(r=>`<div class="rel-row"><div class="rel-badge" style="background:${COLORS[r.k]}">${r.k}</div><div class="rel-text">${r.txt}</div></div>`).join('');
+  return`<div class="result"><div class="result-top"><div class="result-eyebrow">Tu perfil Conversational IQ</div><div class="arch-name" style="color:${info.color}">${info.name}</div><span class="arch-code">${info.code}</span></div>${dual?dualNote(top1,top2,diff):''}<div class="radar-wrap">${radarSVG(s,info.color)}</div><div class="score-bars">${bars}</div><hr class="divider"><div class="section"><div class="section-label">Tu arquetipo</div><p class="arch-desc">${info.desc}</p><p class="frase">${info.frase}</p></div><hr class="divider"><div class="section"><div class="section-label">Áreas de fortaleza</div><ul class="bullets">${info.fortalezas.map(f=>`<li>${f}</li>`).join('')}</ul></div><div class="section"><div class="section-label">Puntos ciegos</div><ul class="bullets warn">${info.ciegos.map(c=>`<li>${c}</li>`).join('')}</ul></div><div class="section"><div class="section-label">Cómo trabajas mejor / qué te drena</div><div class="energy-grid"><div class="energy-card up"><div class="ec-label">Te energiza</div><ul>${info.energiza.map(e=>`<li>${e}</li>`).join('')}</ul></div><div class="energy-card down"><div class="ec-label">Te drena</div><ul>${info.drena.map(e=>`<li>${e}</li>`).join('')}</ul></div></div></div><div class="section"><div class="section-label">Cómo te relacionas con otros estilos</div><div class="rel-grid">${relRows}</div></div><div class="section"><div class="section-label">Rasgos principales</div><div class="pill-row">${info.traits.map(t=>`<span class="pill">${t}</span>`).join('')}</div></div><button class="btn-restart" onclick="restart()">Reiniciar test</button></div>`;
+}
+
+function render(){const app=document.getElementById('app');if(screen==='intro')app.innerHTML=renderIntro();else if(screen==='test')app.innerHTML=renderTest();else app.innerHTML=renderResult();}
+function start(){screen='test';cur=0;render();}
+function pick(i){ans[cur]=i;render();}
+function next(){if(ans[cur]===null)return;if(cur===27){screen='result';render();return;}cur++;render();}
+function back(){if(cur>0){cur--;render();}}
+function restart(){screen='intro';cur=0;ans=new Array(28).fill(null);render();}
+render();
+</script>
+</body>
+</html>
